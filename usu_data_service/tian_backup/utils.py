@@ -180,7 +180,7 @@ def delete_user_file(user, filename):
 def current_site_url():
     """Returns fully qualified URL (no trailing slash) for the current site."""
     #from django.contrib.sites.models import Site
-    current_site = '129.123.41.218:20199'# TODO 'hydro-ds.uwrl.usu.edu'  change back to production
+    current_site = 'hydro-ds.uwrl.usu.edu'
     protocol = getattr(settings, 'MY_SITE_PROTOCOL', 'http')
     port = getattr(settings, 'MY_SITE_PORT', None)
     url = '%s://%s' % (protocol, current_site)

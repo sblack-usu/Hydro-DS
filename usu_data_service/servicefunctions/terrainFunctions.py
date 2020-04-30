@@ -19,6 +19,7 @@ from . watershedFunctions import create_OutletShape
 from . netcdfFunctions import reverse_netCDF_yaxis_and_rename_variable
 from usu_data_service.utils import *
 from .utils import *
+from usu_data_service.servicefunctions.gdal_calc import Calc   # TODO: upload to production
 
 def get_raster_subset(input_raster=None, output_raster=None, xmin=None, ymax=None, xmax=None, ymin=None):
     #parameters are ulx uly lrx lry
@@ -180,27 +181,30 @@ def delineate_Watershed_atShapeFile(input_DEM_raster, input_outlet_shapefile, ou
                                     stream_threshold):
     """TauDEM doesn't take compressed file; uncompress file
         ToDO:  Check compression first"""
-    temp_raster = 'temp.tif'
+
+    file_folder = os.path.dirname(input_DEM_raster)
+    temp_raster = os.path.join(file_folder, 'temp.tif')
+
     retDictionary = uncompressRaster(input_DEM_raster, temp_raster)
     if retDictionary['success']=="False":
         return retDictionary
 
     input_raster = os.path.splitext(input_DEM_raster)[0]      #remove the .tif
     # pit remove
-    cmdString = "pitremove -z "+temp_raster+" -fel "+input_raster+"fel.tif"
+    cmdString = "/home/ahmet/hydosbin/pitremove -z "+temp_raster+" -fel "+input_raster+"fel.tif"
     retDictionary = call_subprocess(cmdString,'pit remove')
     if retDictionary['success']=="False":
         return retDictionary
 
     #d8 flow dir
-    cmdString = "d8flowdir -fel "+input_raster+"fel.tif -sd8 "+input_raster+"sd8.tif -p "\
+    cmdString = "/home/ahmet/hydosbin/d8flowdir -fel "+input_raster+"fel.tif -sd8 "+input_raster+"sd8.tif -p "\
                 +input_raster+"p.tif"
     retDictionary = call_subprocess(cmdString, 'd8 flow direction')
     if retDictionary['success']=="False":
         return retDictionary
 
     #d8 contributing area without outlet shape file
-    cmdString = "aread8 -p "+input_raster+"p.tif -ad8 "+input_raster+"ad8.tif -nc"         #check the effect of -nc
+    cmdString = "/home/ahmet/hydosbin/aread8 -p "+input_raster+"p.tif -ad8 "+input_raster+"ad8.tif -nc"         #check the effect of -nc
     #-o "\ +input_outletshp
     retDictionary = call_subprocess(cmdString, 'd8 contributing area')
     if retDictionary['success']=="False":
@@ -209,13 +213,13 @@ def delineate_Watershed_atShapeFile(input_DEM_raster, input_outlet_shapefile, ou
     #Get statistics of ad8 file to determine threshold
 
     #Stream definition by threshold
-    cmdString = "threshold -ssa "+input_raster+"ad8.tif -src "+input_raster+"src.tif -thresh "+str(stream_threshold)
+    cmdString = "/home/ahmet/hydosbin/threshold -ssa "+input_raster+"ad8.tif -src "+input_raster+"src.tif -thresh "+str(stream_threshold)
     retDictionary = call_subprocess(cmdString, 'Stream definition by threshold')
     if retDictionary['success']=="False":
         return retDictionary
 
     #move outlets to stream
-    cmdString = "moveoutletstostrm -p "+input_raster+"p.tif -src "+input_raster+"src.tif -o "\
+    cmdString = "/home/ahmet/hydosbin/moveoutletstostrm -p "+input_raster+"p.tif -src "+input_raster+"src.tif -o "\
                 +input_outlet_shapefile+ " -om "+output_outlet_shapefile
     retDictionary = call_subprocess(cmdString, 'move outlet to stream')
 
@@ -239,13 +243,13 @@ def delineate_Watershed_atShapeFile(input_DEM_raster, input_outlet_shapefile, ou
     file.write(srs.ExportToWkt())
     file.close()
     #d8 contributing area with outlet shapefile
-    cmdString = "aread8 -p "+input_raster+"p.tif -ad8 "+input_raster+"ad8.tif -o "+output_outlet_shapefile+" -nc"
+    cmdString = "/home/ahmet/hydosbin/aread8 -p "+input_raster+"p.tif -ad8 "+input_raster+"ad8.tif -o "+output_outlet_shapefile+" -nc"
     retDictionary = call_subprocess(cmdString, 'd8 contributing area with outlet shapefile')
     if retDictionary['success'] == "False":
         return retDictionary
 
     #watershed grid file using the threshold function
-    cmdString =  "threshold -ssa "+input_raster+"ad8.tif -src "+output_raster+" -thresh 1"
+    cmdString =  "/home/ahmet/hydosbin/threshold -ssa "+input_raster+"ad8.tif -src "+output_raster+" -thresh 1"
                  ##" python \"C:/Python34/Lib/site-packages/osgeo/gdal_calc.py\" -A "+input_raster+"ad8.tif --outfile="+output_WS_raster+" --calc=A/A"
     retDictionary = call_subprocess(cmdString, "watershed grid computation")
     return retDictionary
@@ -280,3 +284,12 @@ def computeRasterSlope(input_raster=None, output_raster=None):
     cmdString = "gdaldem"+" "+"slope"+" "+input_raster+" "+output_raster+" "+"-compute_edges"
     return call_subprocess(cmdString,'compute slope')
 
+
+def raster_calculator(input_raster=None, function=None, outputfile=None, NoDataValue=0, type='Int32', **kwargs):
+    try:
+        Calc(calc=function, A=input_raster, outfile=outputfile, NoDataValue=NoDataValue, type=type)
+        response_dict = {'success': 'True'}
+    except:
+        response_dict = {'success': 'False',
+                         'message': 'Failed to convert the raster data as integer value'}
+    return response_dict

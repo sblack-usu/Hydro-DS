@@ -13,75 +13,18 @@ from usu_data_service.servicefunctions.watershedFunctions import *
 from usu_data_service.servicefunctions.netcdfFunctions import *
 from usu_data_service.servicefunctions.canopyFunctions import *
 from usu_data_service.servicefunctions.static_data import *
-from usu_data_service.servicefunctions.ueb_model_input import *
-# from usu_data_service.topnet_data_service.TOPNET_Function import CommonLib
+from usu_data_service.topnet_data_service.TOPNET_Function import CommonLib
 from usu_data_service.serializers import *
 from usu_data_service.models import *
 from usu_data_service.utils import *
 from usu_data_service.local_settings import *
 from usu_data_service.capabilities import *
 
-from usu_data_service.servicefunctions.ueb_model_run import run_ueb_simulation_job
-from usu_data_service.servicefunctions.model_parameter_list import create_model_parameter_files
-
 WESTERN_US_DEM = os.path.join(STATIC_DATA_ROOT_PATH, 'subsetsource/nedWesternUS.tif')
 
 logger = logging.getLogger(__name__)
 
 funcs = {
-
-          'computeaverageoftwonetcdfvars':
-                {
-                    'function_to_execute': compute_average_of_two_netCDF_vars,
-                    'file_inputs': [],
-                    'file_outputs': [{'output_netcdf': 'averageTwonetCDFs.nc'}],
-                    'user_file_inputs': ['input_netcdf1', 'input_netcdf2'],
-                    'user_inputs': ['varName1', 'varName2',  'varNameO', 'varOut_unit', 'varOut_longName'],
-                    'validator': ComputeAverageOfTwoNetCDFVarsRequestValidator
-                },
-
-          'subsetprojecttimespaceresamplenetcdftoreferencenetcdf':
-                {
-                    'function_to_execute': subset_project_timespaceResample_netCDF_to_referenceNetCDF,
-                    'file_inputs': [],
-                    'file_outputs': [{'output_netcdf': 'subsetprojSpaceTimeResample.nc'}],
-                    'user_file_inputs': ['input_netcdf', 'reference_netcdf'],
-                    'user_inputs': ['inout_varName', 'ref_varName', 'in_epsgCode', 'tSampling_interval',
-                                    'start_Time', 'dTin', 'inout_timeName', 'time_unitString', 'in_Xcoord', 'in_Ycoord'],
-                    'validator': SubsetProjectTimeSpaceResampleNetCDFToReferenceNetCDF
-                },
-
-          'subsetnetcdfbydatetime':
-                {
-                    'function_to_execute': subset_netCDF_by_datetime,
-                    'file_inputs': [],
-                    'file_outputs': [{'output_netcdf': 'subsetDateTime.nc'}],
-                    'user_file_inputs': ['input_netcdf'],
-                    'user_inputs': ['startDateTime', 'endDateTime', 'dT', 'inout_timeName'],
-                    'validator': SubsetNetCDFbyDateTimeRequestValidator
-                },
-
-          'concatenatemultiplenetcdf':
-                {
-                   'function_to_execute': concatenate_multiple_netCDF,
-                   'file_inputs': [],
-                   'file_outputs': [{'output_netcdf': 'concatenatedMultiple.nc'}],
-                   'user_file_inputs': ['input_netcdf_list'],
-                   #'user_list_inputs': 'input_netcdf_list_json', # ['input_netcdf1', 'input_netcdf2'],
-                   'user_inputs': ['inout_timeName'],
-                   'validator': ConcatenateMultipleNetCDFRequestValidator
-                },
-
-          'subsetnetcdfbycoordinates':
-                {
-                    'function_to_execute': subset_netcdf_by_coordinates,
-                    'file_inputs': [],
-                    'file_outputs': [{'output_netcdf': 'subsetCoords.nc'}],
-                    'user_file_inputs': ['input_netcdf'],
-                    'user_inputs': ['leftX', 'topY', 'rightX', 'bottomY', 'in_Xcoord', 'in_Ycoord'],
-                    'validator': SubsetNetcdfByCoordinatesRequestValidator
-                },
-
           'subsetrastertobbox':
                 {
                     'function_to_execute': get_raster_subset,
@@ -348,7 +291,7 @@ funcs = {
                    'function_to_execute': concatenate_netCDF,
                    'file_inputs': [],
                    'file_outputs': [{'output_netcdf': 'concatenated.nc'}],
-                   'user_inputs': ['inout_timeName'],
+                   'user_inputs': [],
                    'user_file_inputs': ['input_netcdf1', 'input_netcdf2'],
                    'validator': ConcatenateNetCDFRequestValidator
                 },
@@ -405,84 +348,30 @@ funcs = {
                 },
 
           # sample TOPNET service testing
-          # 'downloadstreamflow':
-          #       {
-          #          'function_to_execute': CommonLib.download_streamflow,
-          #          'file_inputs': [],
-          #          'file_outputs': [{'output_streamflow': 'streamflow_calibration.dat'}],
-          #          'user_inputs': ['USGS_gage', 'Start_Year', 'End_Year'],
-          #          'user_file_inputs': [],
-          #          'validator': DownloadStreamflowRequestValidator
-          #       },
-
-
-        # prepare ueb model input
-        'createuebinput':
+          'downloadstreamflow':
                 {
-                   'function_to_execute': run_create_ueb_input_job,
+                   'function_to_execute': CommonLib.download_streamflow,
                    'file_inputs': [],
-                   'file_outputs': [],
-                   'user_inputs': ['hs_username', 'hs_password', 'hs_client_id', 'hs_client_secret',
-                                   'token', 'topY', 'bottomY', 'leftX', 'rightX','dx','dy','epsgCode','resample',
-                                   'lon_outlet', 'lat_outlet', 'streamThreshold', 'dxRes', 'dyRes','wsic','usic',
-                                   'tic','wcic', 'ts_last', 'startDateTime','endDateTime','res_keywords','res_title',
-                                   'watershedName'],
+                   'file_outputs': [{'output_streamflow': 'streamflow_calibration.dat'}],
+                   'user_inputs': ['USGS_gage', 'Start_Year', 'End_Year'],
                    'user_file_inputs': [],
-                   'validator': CreateUebInputValidator
+                   'validator': DownloadStreamflowRequestValidator
                 },
 
-          # run ueb model with HydroShare resource
-          'runuebmodel':
-                {
-                   'function_to_execute': run_ueb_simulation_job,
-                   'file_inputs': [],
-                   'file_outputs': [],
-                   'user_inputs': ['resource_id', 'hs_username', 'hs_password', 'hs_client_id','hs_client_secret',
-                                   'token'],
-                   'user_file_inputs': [],
-                   'validator': RunUebModelValidator
-                },
-
-        # create ueb parameter files
-        'createuebparameterfiles':
-                {
-                    'function_to_execute': create_model_parameter_files,
-                    'file_inputs': [],
-                    'file_outputs': [{'output_control': 'control.dat'},
-                                     {'output_inputcontrol': 'inputcontrol.dat'},
-                                     {'output_outputcontrol': 'outputcontrol.dat'},
-                                     {'output_siteinitial': 'siteinitial.dat'},
-                                     {'output_param': 'param.dat'},
-                                     ],
-                    'user_inputs': ['topY', 'bottomY', 'leftX', 'rightX','wsic','usic','tic','wcic', 'ts_last',
-                                    'startDateTime','endDateTime'],
-                    'user_file_inputs': [],
-                    'validator': CreateUebParameterFiles
-                },
-
-        # raster calculator (convert grid float value as 1 or no data value)
-        'rastercalculator':
-                {
-                    'function_to_execute': raster_calculator,
-                    'file_inputs': [],
-                    'file_outputs': [{'outputfile': 'output.tif'}],
-                    'user_inputs': ['function', 'NoDataValue', 'type'],
-                    'user_file_inputs': ['input_raster'],
-                    'validator': RasterCalculator
-                },
-
-        }
-
-
+         }
 
 
 class RunService(APIView):
     """
     Executes the specified service/function
+
     URL: /api/dataservice/{func}
     HTTP method: GET
+
     :param func: name of the function to execute
+
     The function specific parameter values needs to be passed as part of the query string
+
     :raises
     ValidationError: json response format: {'parameter_1': [parameter_1_error], 'parameter_2': [parameter_2_error], ..}
     """
@@ -506,13 +395,10 @@ class RunService(APIView):
         if not request_validator.is_valid():
             raise DRF_ValidationError(detail=request_validator.errors)
 
-
         subprocparams = {}
-
         for param_dict_item in params['file_inputs']:
             for param_name in param_dict_item:
                 subprocparams[param_name] = param_dict_item[param_name]
-
 
         # generate uuid file name for each parameter in file_outputs dict
         uuid_file_path = generate_uuid_file_path()
@@ -527,7 +413,7 @@ class RunService(APIView):
                 output_files[param_name] = subprocparams[param_name]
 
         for p in params['user_inputs']:
-            subprocparams[p] = request_validator.validated_data.get(p)
+            subprocparams[p] = request_validator.validated_data[p]
 
         # user input file can come as a url file path or just a file name
         # comes in url format for files that are stored for the user in django, copy the file to uuid temp folder
@@ -535,131 +421,37 @@ class RunService(APIView):
         # comes as a file name for static data file on the server, get the static data file path from the file name
         # and pass that file path to the executing function
         for p in params['user_file_inputs']:
-            input_files = request_validator.validated_data[p]
-            input_file_path_list = []
-            if not isinstance(input_files, list):
-                input_files = [input_files]
-            for input_file in input_files:
-                if is_input_file_url_path(input_file):
-                    uuid_input_file_path = copy_input_file_to_uuid_working_directory(uuid_file_path,
-                                                                                     request_validator.validated_data[p])
-                    if uuid_input_file_path.endswith('.zip'):
-                        unzip_shape_file(uuid_input_file_path)
-                        uuid_input_file_path = uuid_input_file_path.replace('zip', 'shp')
+            input_file = request_validator.validated_data[p]
+            if is_input_file_url_path(input_file):
+                uuid_input_file_path = copy_input_file_to_uuid_working_directory(uuid_file_path,
+                                                                                 request_validator.validated_data[p])
+                if uuid_input_file_path.endswith('.zip'):
+                    unzip_shape_file(uuid_input_file_path)
+                    uuid_input_file_path = uuid_input_file_path.replace('zip', 'shp')
 
-                    if len(input_files) == 1:
-                        subprocparams[p] = uuid_input_file_path
-                    else:
-                        input_file_path_list.append(uuid_file_path)
-                    logger.debug('input_uuid_file_path_from_url_path:' + uuid_input_file_path)
-                else:
-                    static_data_file_path = get_static_data_file_path(input_file)
-                    if len(input_files) == 1:
-                        subprocparams[p] = static_data_file_path
-                    else:
-                        input_file_path_list.append(static_data_file_path)
-                    logger.debug('input_static_file_path:' + static_data_file_path)
-
-            if len(input_files) > 1:
-                subprocparams[p] = input_file_path_list
-
-        #list from json string
-        # if func == 'concatenatemultiplenetcdf':
-        #     pdict = params['user_list_inputs']
-        #     #print(pdict)
-        #     input_fileList = request_validator.validated_data[pdict]
-        #     #print(input_fileList)
-        #     user_input_json_list = json.loads(input_fileList)
-        #     input_file_path_list = []
-        #     for input_file in user_input_json_list:
-        #         #input_file = request_validator.validated_data[p]
-        #         #input_file = user_input_json_list[p]
-        #         if is_input_file_url_path(input_file):
-        #             uuid_input_file_path = copy_input_file_to_uuid_working_directory(uuid_file_path, input_file)
-        #                                                                              #request_validator.validated_data[p])
-        #             #subprocparams[p] = uuid_input_file_path
-        #             input_file_path_list.append(uuid_input_file_path)
-        #             logger.debug('input_uuid_file_path_from_url_path:' + uuid_input_file_path)
-        #         else:
-        #             logger.debug('error file does not exisit in user space: ' + input_file)
-        #     subprocparams[pdict] = json.dumps(input_file_path_list)
+                subprocparams[p] = uuid_input_file_path
+                logger.debug('input_uuid_file_path_from_url_path:' + uuid_input_file_path)
+            else:
+                static_data_file_path = get_static_data_file_path(input_file)
+                subprocparams[p] = static_data_file_path
+                logger.debug('input_static_file_path:' + static_data_file_path)
 
         # execute the function
-        if func in ['runuebmodel', 'createuebinput']:
-           subprocparams['request'] = request
-
         result = params['function_to_execute'](**subprocparams)
         logger.debug('result from function ({function_name}):{result}'.format(function_name=func, result=result))
 
-
-        # process function output results  # TODO remove this
+        # process function output results
         data = []
         if result['success'] == 'True':
             user = request.user if request.user.is_authenticated() else None
-
-            if func in ['createuebinput', 'runuebmodel']:
-                response_data = {'success': True, 'data': {'info': result['message']}, 'error': []}
-            else:
-                data = _save_output_files_in_django(output_files, user=user)
-                response_data = {'success': True, 'data': data, 'error': []}
+            data = _save_output_files_in_django(output_files, user=user)
+            response_data = {'success': True, 'data': data, 'error': []}
         else:
             response_data = {'success': False, 'data': data, 'error': result['message']}
 
         delete_working_uuid_directory(uuid_file_path)
 
         return Response(data=response_data)
-
-
-# @api_view(['GET'])
-# def check_job_status(request):
-#     job_id = request.GET['job_id']
-#     job = Job.objects.filter(id=job_id).first()
-#     if job is not None:
-#         response_data = {'success': True,
-#                          'data': [job.id, job.status, job.start_time, job.end_time,
-#                                   job.job_description, job.is_success, job.message, job.extra_data],
-#                          'error': []}
-#     else:
-#         response_data = {'success': False, 'data': '', 'error': ['No job was found']}
-#     return Response(data=response_data)
-
-
-@api_view(['GET'])
-def check_job_status(request):
-    filter_dict = {}
-
-    for filter in ['id', 'status', 'extra_data']:
-        if request.GET.get(filter):
-            filter_dict[filter] = request.GET.get(filter)
-
-    job_list = Job.objects.filter(**filter_dict)
-
-    if job_list:
-        data = []
-
-        for job in job_list:
-
-            job_info = {
-                'id': job.id,
-                'user': job.user.username,
-                'status': job.status,
-                'start_time': job.start_time.strftime('%Y-%m-%d %H:%M:%S %z'),
-                'end_time': job.end_time.strftime('%Y-%m-%d %H:%M:%S %z') if job.end_time is not None else job.end_time,
-                'job_description': job.job_description,
-                'message': job.message,
-                'is_success': job.is_success,
-                'extra_data': job.extra_data,
-            }
-
-            data.append(job_info)
-
-        response_data = {'success': True,
-                         'data': data,
-                         'error': []}
-    else:
-        response_data = {'success': False, 'data': [], 'error': ['No job was found']}
-
-    return Response(data=response_data)
 
 
 @api_view(['GET'])
@@ -883,3 +675,6 @@ def _save_output_files_in_django(output_files, user=None):
         logger.debug('django file url for the output file:' + user_file.file.url)
 
     return output_files_in_django
+
+
+

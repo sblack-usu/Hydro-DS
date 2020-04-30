@@ -5,22 +5,6 @@ import collections
 
 def get_capabilites():
     capabilities = []
-
-    capabilities.append(_get_capability_dict(service_name='computeaverageoftwonetcdfvars',
-                                             description='Compute average of two netCDF variables'))
-
-    capabilities.append(_get_capability_dict(service_name='subsetprojecttimespaceresamplenetcdftoreferencenetcdf',
-                                             description='subset NetCDF, project and resample in time and space to reference netcdf'))
-
-    capabilities.append(_get_capability_dict(service_name='subsetnetcdfbydatetime',
-                                             description='subset NetCDF data by date time'))
-
-    capabilities.append(_get_capability_dict(service_name='concatenatemultiplenetcdf',
-                                             description='concatenate multiple netCDF by time'))
-
-    capabilities.append(_get_capability_dict(service_name='subsetnetcdfbycoordinates',
-                                             description='subset netCDF by spacifying spaitial coordinates'))
-
     capabilities.append(_get_capability_dict(service_name='subsetrastertobbox',
                                              description='subset raster to bounding box'))
 
@@ -126,20 +110,6 @@ def get_capabilites():
 
     capabilities.append(_get_capability_dict(service_name='zipfiles',
                                              description="zip a set of user files on HydroDS"))
-
-
-    capabilities.append(_get_capability_dict(service_name='createuebinput',
-                                             description='create model input package for ueb model'))
-
-    capabilities.append(_get_capability_dict(service_name='runuebmodel',
-                                             description="Run ueb model using HydroShare resource"))
-
-    capabilities.append(_get_capability_dict(service_name='createuebparameterfiles',
-                                             description="Generate the model parameter setting files"))
-
-    capabilities.append(_get_capability_dict(service_name='rastercalculator',
-                                             description="raster calculator to derive new raster with a given raster file"))
-
     return capabilities
 
 
@@ -152,11 +122,7 @@ def get_service_info(service_name):
     # for service in supported_services:
     #     services_info_dict[service] = getattr(service_info_helper_obj, 'get_%s_info' % service)
 
-    services_info_dict['computeaverageoftwonetcdfvars'] = _get_computeaverageoftwonetcdfvars_info
-    services_info_dict['subsetprojecttimespaceresamplenetcdftoreferencenetcdf'] = _get_subsetprojecttimespaceresamplenetcdftoreferencenetcdf_info
-    services_info_dict['subsetnetcdfbydatetime'] = _get_subsetnetcdfbydatetime_info
-    services_info_dict['concatenatemultiplenetcdf'] = _get_concatenatemultiplenetcdf_info
-    services_info_dict['subsetnetcdfbycoordinates'] = _get_subsetnetcdfbycoordinates_info
+
 
     services_info_dict['subsetrastertobbox'] = _get_susbsetrastertobbox_info
     services_info_dict['subsetrastertoreference'] = _get_subsetrastertoreference_info
@@ -193,11 +159,6 @@ def get_service_info(service_name):
     services_info_dict['listfiles'] = _get_listfiles_info
     services_info_dict['deletefile'] = _get_deletefile_info
     services_info_dict['zipfiles'] = _get_zipfiles_info
-    services_info_dict['createuebinput'] = _get_createuebinput_info
-    services_info_dict['runuebmodel'] = _get_runuebmodel_info
-    services_info_dict['createuebparameterfiles'] = _get_createuebparameterfiles_info
-    services_info_dict['rastercalculator'] = _get_rastercalculator_info
-
 
     if service_name in services_info_dict:
         return services_info_dict[service_name]()
@@ -227,243 +188,6 @@ def _get_end_point(url_sub_path):
 def _get_capability_dict(service_name, description):
     return {'service_name': service_name, 'description': description,
             'service_info_url': _get_service_info_url(service_name)}
-
-def _get_computeaverageoftwonetcdfvars_info():
-    service_name = 'computeaverageoftwonetcdfvars'
-    return {service_name: [{'end_point': _get_end_point(service_name), 'http_method': 'GET',
-                            'parameters': [
-                                            _get_param_dict(name='input_netcdf1',
-                                                            description='name for the 1st input NetCDF file',
-                                                            required=True,
-                                                            type='string'),
-
-                                            _get_param_dict(name='input_netcdf2',
-                                                            description='name for the 2nd input NetCDF file',
-                                                            required=True,
-                                                            type='string'),
-
-                                            _get_param_dict(name='output_netcdf',
-                                                            description='name for the output NetCDF file',
-                                                            required=True,
-                                                            type='string'),
-
-                                            _get_param_dict(name='varName1',
-                                                            description='name for the 1st variable',
-                                                            required=True,
-                                                            type='string'),
-
-                                            _get_param_dict(name='varName2',
-                                                            description='name for the 2nd variable',
-                                                            required=True,
-                                                            type='string'),
-
-                                            _get_param_dict(name='varNameO',
-                                                            description='name for the output variable',
-                                                            required=True,
-                                                            type='string'),
-
-                                            _get_param_dict(name='varOut_unit',
-                                                            description='name for the output variable unit',
-                                                            required=True,
-                                                            type='string'),
-
-                                            _get_param_dict(name='varOut_longName',
-                                                            description='long name for the output variable',
-                                                            required=True,
-                                                            type='string'),
-                                          ]
-                        },
-                        _get_json_response_format(data_dict={'output_netcdf': 'url of the output NetCDF file'})]
-            }
-
-
-def _get_subsetprojecttimespaceresamplenetcdftoreferencenetcdf_info():
-    service_name = 'subsetprojecttimespaceresamplenetcdftoreferencenetcdf'
-    return {service_name: [{'end_point': _get_end_point(service_name), 'http_method': 'GET',
-                            'parameters': [
-                                            _get_param_dict(name='input_netcdf',
-                                                            description='name for the input NetCDF file',
-                                                            required=True,
-                                                            type='string'),
-
-                                            _get_param_dict(name='reference_netcdf',
-                                                            description='name for the reference NetCDF file',
-                                                            required=True,
-                                                            type='string'),
-
-                                            _get_param_dict(name='output_netcdf',
-                                                            description='name for the output NetCDF file',
-                                                            required=True,
-                                                            type='string'),
-
-                                            _get_param_dict(name='inout_varName',
-                                                            description='name for the input variable',
-                                                            required=True,
-                                                            type='string'),
-
-                                            _get_param_dict(name='ref_varName',
-                                                            description='name for the reference variable',
-                                                            required=True,
-                                                            type='string'),
-
-                                            _get_param_dict(name='in_epsgCode',
-                                                            description='epsg code for projection',
-                                                            required=True,
-                                                            type='integer'),
-
-                                            _get_param_dict(name='tSampling_interval',
-                                                            description='smapling time steps; for aggregating in time',
-                                                            required=True,
-                                                            type='integer'),
-
-                                            _get_param_dict(name='start_Time',
-                                                            description='Time of the first time step in output netCDF',
-                                                            required=True,
-                                                            type='float'),
-
-                                            _get_param_dict(name='dTin',
-                                                            description='Time step in hour of the input netCDF files.',
-                                                            required=True,
-                                                            type='float'),
-
-                                            _get_param_dict(name='inout_timeName',
-                                                            description='Name of the time coordinate and variable of the input/output netCDF files.',
-                                                            required=True,
-                                                            type='string'),
-
-                                            _get_param_dict(name='time_unitString',
-                                                            description='unit of time variable',
-                                                            required=True,
-                                                            type='string'),
-
-                                            _get_param_dict(name='in_Xcoord',
-                                                            description='Name of the X coordinate of the input netCDF files.',
-                                                            required=True,
-                                                            type='string'),
-
-                                            _get_param_dict(name='in_Ycoord',
-                                                            description='Name of the Y coordinate of the input netCDF files.',
-                                                            required=True,
-                                                            type='string'),
-                                          ]
-                        },
-                        _get_json_response_format(data_dict={'output_netcdf': 'url of the output NetCDF file'})]
-            }
-
-
-def _get_subsetnetcdfbydatetime_info():
-    service_name = 'subsetnetcdfbydatetime'
-    return {service_name: [{'end_point': _get_end_point(service_name), 'http_method': 'GET',
-                            'parameters': [
-                                            _get_param_dict(name='input_netcdf',
-                                                            description='name for the input NetCDF file',
-                                                            required=True,
-                                                            type='string'),
-
-                                            _get_param_dict(name='output_netcdf',
-                                                            description='name for the output NetCDF file',
-                                                            required=True,
-                                                            type='string'),
-
-                                            _get_param_dict(name='startDateTime',
-                                                            description='Start of the time period to be subsetted; formatted datetime string.',
-                                                            required=True,
-                                                            type='string'),
-
-                                            _get_param_dict(name='endDateTime',
-                                                            description='End of the time period to be subsetted; formatted datetime string.',
-                                                            required=True,
-                                                            type='string'),
-
-                                            _get_param_dict(name='dT',
-                                                            description='Time step in hour of the input netCDF files.',
-                                                            required=True,
-                                                            type='float'),
-
-                                            _get_param_dict(name='inout_timeName',
-                                                            description='Name of the time coordinate and variable of the input/output netCDF files.',
-                                                            required=True,
-                                                            type='string'),
-                                         ]
-                        },
-                        _get_json_response_format(data_dict={'output_netcdf': 'url of the output NetCDF file'})]
-            }
-
-
-
-def _get_concatenatemultiplenetcdf_info():
-    service_name = 'concatenatemultiplenetcdf'
-    return {service_name: [{'end_point': _get_end_point(service_name), 'http_method': 'GET',
-                            'parameters': [
-
-                                            _get_param_dict(name='output_netcdf',
-                                                            description='name for the output NetCDF file',
-                                                            required=True,
-                                                            type='string'),
-
-                                            _get_param_dict(name='inout_timeName',
-                                                            description='Name of the time coordinate and variable of the input/output netCDF files.',
-                                                            required=True,
-                                                            type='string'),
-
-                                            _get_param_dict(name='input_netcdf_list_json',
-                                                            description='Json List of the input netCDF files.',
-                                                            required=True,
-                                                            type='string'),
-                                          ]
-                        },
-                        _get_json_response_format(data_dict={'output_netcdf': 'url of the output NetCDF file'})]
-            }
-
-
-def _get_subsetnetcdfbycoordinates_info():
-    service_name = 'subsetnetcdfbycoordinates'
-    return {service_name: [{'end_point': _get_end_point(service_name), 'http_method': 'GET',
-                            'parameters': [
-
-                                            _get_param_dict(name='input_netcdf',
-                                                            description='name for the input NetCDF file',
-                                                            required=True,
-                                                            type='string'),
-
-                                            _get_param_dict(name='output_netcdf',
-                                                            description='name for the output NetCDF file',
-                                                            required=True,
-                                                            type='string'),
-
-                                            _get_param_dict(name='leftX',
-                                                           description='X-coordinate of the left boundary of the bounding box',
-                                                           required=True,
-                                                           type='float'),
-
-                                            _get_param_dict(name='topY',
-                                                           description='Y-coordinate of the top boundary of the bounding box',
-                                                           required=True,
-                                                           type='float'),
-
-                                            _get_param_dict(name='rightX',
-                                                           description='X-coordinate of the right boundary of the bounding box',
-                                                           required=True,
-                                                           type='float'),
-
-                                            _get_param_dict(name='bottomY',
-                                                           description='Y-coordinate of the bottom boundary of the bounding box',
-                                                           required=True,
-                                                           type='float'),
-
-                                            _get_param_dict(name='in_Xcoord',
-                                                            description='Name of the X coordinate of the input netCDF files.',
-                                                            required=True,
-                                                            type='string'),
-
-                                            _get_param_dict(name='in_Ycoord',
-                                                            description='Name of the Y coordinate of the input netCDF files.',
-                                                            required=True,
-                                                            type='string'),
-                                         ]
-                        },
-                        _get_json_response_format(data_dict={'output_netcdf': 'url of the output NetCDF file'})]
-            }
 
 
 def _get_susbsetrastertobbox_info():
@@ -1271,13 +995,8 @@ def _get_concatenatenetcdf_info():
                                             _get_param_dict(name='output_netcdf',
                                                             description='name for the output NetCDF file',
                                                             required=True,
-                                                            type='string'),
-
-                                            _get_param_dict(name='inout_timeName',
-                                                            description='name for the time variable/dim in output NetCDF file',
-                                                            required=True,
                                                             type='string')
-                                          ]
+                                        ]
                                     },
                                     _get_json_response_format(data_dict={'output_netcdf': 'url of the output NetCDF file'})]
           }
@@ -1467,124 +1186,3 @@ def _get_zipfiles_info():
                                         _get_json_response_format(data_dict={'zip_file_name': 'url of the zipped file'}
                                                                   )]
           }
-
-
-
-def _get_createuebinput_info():
-    # TODO: add more parameter info
-    service_name = 'createuebinput'
-    return {service_name: [{'end_point': _get_end_point(service_name), 'http_method': 'GET',
-                            'parameters': [
-                                _get_param_dict(name='hs_username',
-                                                description='user name of HydroShare account',
-                                                required=False,
-                                                type='string'),
-
-                                _get_param_dict(name='hs_password',
-                                                description='password of HydroShare account',
-                                                required=False,
-                                                type='string'),
-
-                                _get_param_dict(name='hs_client_id',
-                                                description='client id of the HydroShare app',
-                                                required=False,
-                                                type='string'),
-
-                                _get_param_dict(name='hs_clien_secret',
-                                                description='client secret of the HydroShare app',
-                                                required=False,
-                                                type='string'),
-
-                                _get_param_dict(name='token',
-                                                description='HydroShare token dictionary as string',
-                                                required=False,
-                                                type='string'),
-                            ]
-                            },
-                           _get_json_response_format(data_dict={})]
-            }
-
-def _get_runuebmodel_info():
-    service_name = 'runuebmodel'
-    return {service_name: [{'end_point': _get_end_point(service_name), 'http_method': 'GET',
-                            'parameters': [
-                                _get_param_dict(name='resource_id',
-                                                description='HydroShare resource identifier',
-                                                required=True,
-                                                type='string'),
-
-                                _get_param_dict(name='hs_username',
-                                                description='user name of HydroShare account',
-                                                required=False,
-                                                type='string'),
-
-                                _get_param_dict(name='hs_password',
-                                                description='password of HydroShare account',
-                                                required=False,
-                                                type='string'),
-
-                                _get_param_dict(name='hs_client_id',
-                                                description='client id of the HydroShare app',
-                                                required=False,
-                                                type='string'),
-
-                                _get_param_dict(name='hs_clien_secret',
-                                                description='client secret of the HydroShare app',
-                                                required=False,
-                                                type='string'),
-
-                                _get_param_dict(name='token',
-                                                description='HydroShare token dictionary as string',
-                                                required=False,
-                                                type='string'),
-                           ]
-                            },
-                           _get_json_response_format(data_dict={})]
-            }
-
-def _get_createuebparameterfiles_info():
-    service_name = 'createuebparameterfiles'
-    return {service_name: [{'end_point': _get_end_point(service_name), 'http_method': 'GET',
-                            'parameters': [
-                                _get_param_dict(name='startDateTime',
-                                                description='The start time for model simulation',
-                                                required=True,
-                                                type='string'),
-                                _get_param_dict(name='endDateTime',
-                                                description='The end time for model simulation',
-                                                required=True,
-                                                type='string'),
-                            ]
-                            },
-                           _get_json_response_format(data_dict={})]
-            }
-
-
-def _get_rastercalculator_info():
-    service_name = 'rastercalculator'
-    return {service_name: [{'end_point': _get_end_point(service_name), 'http_method': 'GET',
-                            'parameters': [
-                                _get_param_dict(name='input_raster',
-                                                description='HydroDS url file path for a user owned raster file to be calculated',
-                                                required=True,
-                                                type='string'),
-                                _get_param_dict(name='outputfile',
-                                                description='Output file name for the result',
-                                                required=False,
-                                                type='string'),
-                                _get_param_dict(name='function',
-                                                description='logical expresion of the calculation',
-                                                required=True,
-                                                type='string'),
-                                _get_param_dict(name='NoDataValue',
-                                                description='No data value of the output file',
-                                                required=False,
-                                                type='Integer'),
-                                _get_param_dict(name='type',
-                                                description='Data type of the output file',
-                                                required=False,
-                                                type='String'),
-                            ]
-                            },
-                           _get_json_response_format(data_dict={})]
-            }

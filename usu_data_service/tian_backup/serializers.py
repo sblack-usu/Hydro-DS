@@ -74,56 +74,6 @@ class InputNetCDFURLorStaticRequestValidator(serializers.Serializer):
         return value
 
 
-class ComputeAverageOfTwoNetCDFVarsRequestValidator(serializers.Serializer):
-    input_netcdf1 = serializers.URLField(required=True)
-    input_netcdf2 = serializers.URLField(required=True)
-    output_netcdf = serializers.CharField(required=False)
-    varName1 = serializers.CharField(required=False)
-    varName2 = serializers.CharField(required=False)
-    varNameO = serializers.CharField(required=False)
-    varOut_unit = serializers.CharField(required=False)
-    varOut_longName = serializers.CharField(required=False)
-
-
-class SubsetProjectTimeSpaceResampleNetCDFToReferenceNetCDF(InputNetCDFURLorStaticRequestValidator):
-    reference_netcdf = serializers.CharField(required=True)
-    output_netcdf = serializers.CharField(required=True)
-    inout_varName = serializers.CharField(required=True)
-    ref_varName = serializers.CharField(required=True)
-    in_epsgCode = serializers.IntegerField(required=True)
-    tSampling_interval = serializers.IntegerField(required=True)
-    start_Time = serializers.DecimalField(required=True, max_digits=12, decimal_places=8)
-    dTin = serializers.DecimalField(required=True, max_digits=12, decimal_places=8)
-    inout_timeName = serializers.CharField(required=True)
-    time_unitString = serializers.CharField(required=True)
-    in_Xcoord = serializers.CharField(required=True)
-    in_Ycoord = serializers.CharField(required=True)
-
-
-class SubsetNetCDFbyDateTimeRequestValidator(InputNetCDFURLorStaticRequestValidator):
-    output_netcdf = serializers.CharField(required=True)
-    startDateTime = serializers.CharField(required=True)
-    endDateTime = serializers.CharField(required=True)
-    dT = serializers.DecimalField(required=True, max_digits=12, decimal_places=8)
-    inout_timeName = serializers.CharField(required=True)
-
-
-class ConcatenateMultipleNetCDFRequestValidator(serializers.Serializer):
-    output_netcdf = serializers.CharField(required=True)
-    inout_timeName = serializers.CharField(required=True)
-    input_netcdf_list_json = serializers.CharField(required=True)
-
-
-class SubsetNetcdfByCoordinatesRequestValidator(InputNetCDFURLorStaticRequestValidator):
-    output_netcdf = serializers.CharField(required=True)
-    leftX = serializers.DecimalField(required=True, max_digits=12, decimal_places=8)
-    topY = serializers.DecimalField(required=True, max_digits=12, decimal_places=8)
-    rightX = serializers.DecimalField(required=True, max_digits=12, decimal_places=8)
-    bottomY = serializers.DecimalField(required=True, max_digits=12, decimal_places=8)
-    in_Xcoord = serializers.CharField(required=True)
-    in_Ycoord = serializers.CharField(required=True)
-
-
 class DelineateWatershedAtXYRequestValidator(serializers.Serializer):
     outlet_point_x = serializers.DecimalField(required=True, max_digits=12, decimal_places=8)
     outlet_point_y = serializers.DecimalField(required=True, max_digits=12, decimal_places=8)
@@ -285,7 +235,6 @@ class ConcatenateNetCDFRequestValidator(serializers.Serializer):
     input_netcdf1 = serializers.URLField(required=True)
     input_netcdf2 = serializers.URLField(required=True)
     output_netcdf = serializers.CharField(required=False)
-    inout_timeName = serializers.CharField(required=True)
 
 
 class ProjectSubsetResampleNetCDFRequestValidator(ResampleNetCDFRequestValidator):
@@ -398,71 +347,3 @@ class GetHydrogateResultFileRequestValidator(serializers.Serializer):
             raise serializers.ValidationError("%s must be a file name ending with .zip" % 'save_as_file_name')
 
         return value
-
-
-class CreateUebInputValidator(serializers.Serializer):
-    # TODO some parameters are requried
-    hs_client_id = serializers.CharField(required=False)
-    hs_client_secret = serializers.CharField(required=False)
-    token = serializers.CharField(required=False)
-    hs_username = serializers.CharField(required=False)
-    hs_password = serializers.CharField(required=False)
-    topY = serializers.FloatField(required=False)
-    bottomY = serializers.FloatField(required=False)
-    leftX = serializers.FloatField(required=False)
-    rightX = serializers.FloatField(required=False)
-    dx = serializers.FloatField(required=False)
-    dy = serializers.FloatField(required=False)
-    epsgCode = serializers.CharField(required=False)
-    resample = serializers.CharField(required=False)
-    lon_outlet = serializers.FloatField(required=False)
-    lat_outlet = serializers.FloatField(required=False)
-    streamThreshold = serializers.IntegerField(required=False)
-    dxRes = serializers.FloatField(required=False)
-    dyRes = serializers.FloatField(required=False)
-    startDateTime = serializers.CharField(required=False)
-    endDateTime = serializers.CharField(required=False)
-    usic = serializers.FloatField(required=False)
-    wsic = serializers.FloatField(required=False)
-    tic = serializers.FloatField(required=False)
-    wcic = serializers.FloatField(required=False)
-    ts_last = serializers.FloatField(required=False)
-    res_keywords = serializers.CharField(required=False)
-    res_title = serializers.CharField(required=False)
-    watershedName = serializers.CharField(required=False)
-
-
-class RunUebModelValidator(serializers.Serializer):
-    resource_id = serializers.CharField(min_length=32, required=True)
-    hs_client_id = serializers.CharField(required=False)
-    hs_client_secret = serializers.CharField(required=False)
-    token = serializers.CharField(required=False)
-    hs_username = serializers.CharField(required=False)
-    hs_password = serializers.CharField(required=False)
-
-
-class CreateUebParameterFiles(serializers.Serializer):
-    topY = serializers.FloatField(required=True)
-    bottomY = serializers.FloatField(required=True)
-    leftX = serializers.FloatField(required=True)
-    rightX = serializers.FloatField(required=True)
-    startDateTime = serializers.CharField(required=True)
-    endDateTime = serializers.CharField(required=True)
-    usic = serializers.FloatField(required=True)
-    wsic = serializers.FloatField(required=True)
-    tic = serializers.FloatField(required=True)
-    wcic = serializers.FloatField(required=True)
-    ts_last = serializers.FloatField(required=True)
-    output_control = serializers.CharField(required=False)
-    output_inputcontrol = serializers.CharField(required=False)
-    output_outputcontrol = serializers.CharField(required=False)
-    output_siteinitial= serializers.CharField(required=False)
-    output_param = serializers.CharField(required=False)
-
-
-class RasterCalculator(serializers.Serializer):
-    input_raster = serializers.URLField(required=True)
-    function = serializers.CharField(required=True)
-    outputfile = serializers.CharField(required=False)
-    NoDataValue = serializers.FloatField(required=False)
-    type = serializers.CharField(required=False)
